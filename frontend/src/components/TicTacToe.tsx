@@ -4,6 +4,7 @@ type Player = "X" | "O";
 type Cell = Player | null;
 
 type Props = {
+  gameID: number;
   onWin?: (winner: Player | "draw" | null) => void;
 };
 
@@ -24,7 +25,7 @@ const API_BASE =
 
 
 
-export default function TicTacToe({ onWin }: Props) {
+export default function TicTacToe({ gameID,onWin }: Props) {
   const [state, setState] = React.useState<GameStateDTO | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -133,9 +134,8 @@ export default function TicTacToe({ onWin }: Props) {
   const { board, status } = state;
 
   return (
-    <div className="max-w-sm mx-auto p-4">
-      <div className="text-center mb-2 text-xl font-semibold">{status}</div>
-      <div className="grid grid-cols-3 gap-2">
+    <div>
+      <div className="grid grid-cols-3 gap-2 inset-0 bg-black/100">
         {board.map((c, i) => (
           <button
             key={i}
@@ -147,11 +147,6 @@ export default function TicTacToe({ onWin }: Props) {
             {c}
           </button>
         ))}
-      </div>
-      <div className="text-center mt-3">
-        <button className="rounded-2xl px-4 py-2 border" onClick={reset} disabled={loading}>
-          New Game
-        </button>
       </div>
     </div>
   );
