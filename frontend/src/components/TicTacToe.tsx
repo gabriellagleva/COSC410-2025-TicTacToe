@@ -154,11 +154,11 @@ export default function TicTacToe({ gameID, onWin }: Props) {
 
   const renderWinner = () => {
     if (state.winner === "X") {
-      return <div>X Wins</div>;
+      return <div>X</div>;
     } else if (state.winner === "O") {
-      return <div>O wins</div>;
+      return <div>O</div>;
     } else if (state.is_draw) {
-      return <div>Draw</div>;
+      return <div>D</div>;
     }
     else
       return (<div className="grid grid-cols-3 gap-2 border">

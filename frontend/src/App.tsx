@@ -47,7 +47,7 @@ export default function App() {
           </div>
           <div className="text-center mt-4">
             <button className="rounded-2xl px-4 py-2">
-              New Game
+              {/* New Game  Ask about new game button */}
             </button>
           </div>
         </AppProviderActiveBoard>
