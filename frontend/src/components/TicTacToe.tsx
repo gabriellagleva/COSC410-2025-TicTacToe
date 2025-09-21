@@ -6,6 +6,7 @@ type Cell = Player | null;
 type Props = {
   gameID: number;
   onWin?: (winner: Player | "draw" | null) => void;
+  active: Boolean
 };
 
 // ----- Backend DTOs -----
@@ -25,7 +26,7 @@ const API_BASE =
 
 
 
-export default function TicTacToe({ gameID,onWin }: Props) {
+export default function TicTacToe({ gameID, onWin, active }: Props) {
   const [state, setState] = React.useState<GameStateDTO | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -133,21 +134,33 @@ export default function TicTacToe({ gameID,onWin }: Props) {
 
   const { board, status } = state;
 
-  return (
-    <div>
-      <div className="grid grid-cols-3 gap-2 inset-0 bg-black/100">
+  const renderWinner = () => {
+    if (state.winner === "X") {
+      return <div>X Wins</div>;
+    } else if (state.winner === "O") {
+      return <div>O wins</div>;
+    } else if (state.is_draw) {
+      return <div>Draw</div>;
+    }
+    else
+      return (<div className="grid grid-cols-3 gap-2 border">
         {board.map((c, i) => (
           <button
             key={i}
             className="aspect-square rounded-2xl border text-3xl font-bold flex items-center justify-center disabled:opacity-50"
             onClick={() => handleClick(i)}
             aria-label={`cell-${i}`}
-            disabled={loading || c !== null || state.winner !== null || state.is_draw}
+            disabled={loading || c !== null || state.winner !== null || state.is_draw ||active == false}
           >
             {c}
           </button>
         ))}
       </div>
-    </div>
+      )
+    return null;
+  };
+
+  return (
+    renderWinner()
   );
 }
