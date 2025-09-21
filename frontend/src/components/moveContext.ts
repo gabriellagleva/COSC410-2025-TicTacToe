@@ -1,6 +1,14 @@
+// AppContext.ts
 import { createContext } from 'react';
 
-// Create a context with a default value of 'light'
-let moveContext = createContext<string>('X'); 
+// Define the type for the context's value
+export type moveContextType = {
+    move: string
+    setMove: (move: string) => void;
+};
 
-export default moveContext;
+// Create the context with a default value
+export const moveContext = createContext<moveContextType>({
+    move: 'X',
+    setMove: () => { },
+});

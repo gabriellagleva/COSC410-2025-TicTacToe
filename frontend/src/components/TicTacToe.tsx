@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from 'react';
 
 type Player = "X" | "O";
 type Cell = Player | null;
@@ -69,12 +69,12 @@ export default function TicTacToe({ gameID, onWin, active }: Props) {
     return r.json();
   }
 
-  async function playMove(index: number): Promise<GameStateDTO> {
+  async function playMove(index: number, move: string): Promise<GameStateDTO> {
     if (!state) throw new Error("No game");
     const r = await fetch(`${API_BASE}/tictactoe/${state.id}/move`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ index }),
+      body: JSON.stringify({ index, move }),
     });
     if (!r.ok) {
       const detail = await r.json().catch(() => ({}));
