@@ -33,7 +33,7 @@ def _is_full(board: List[Cell]) -> bool:
 def new_game() -> GameState:
     return GameState()
 
-def move(state: GameState, index: int) -> GameState:
+def move(state: GameState, index: int, move: str) -> GameState:
     if state.winner or state.is_draw:
         raise ValueError("Game is already over.")
     if not (0 <= index < 9):
@@ -42,7 +42,7 @@ def move(state: GameState, index: int) -> GameState:
         raise ValueError("Cell already occupied.")
 
     next_state = state.copy()
-    next_state.board[index] = state.current_player
+    next_state.board[index] = move
 
     w = _check_winner(next_state.board)
     if w:
@@ -51,6 +51,7 @@ def move(state: GameState, index: int) -> GameState:
         next_state.is_draw = True
     else:
         next_state.current_player = "O" if state.current_player == "X" else "X"
+    print(next_state)
     return next_state
 
 def available_moves(state: GameState) -> List[int]:

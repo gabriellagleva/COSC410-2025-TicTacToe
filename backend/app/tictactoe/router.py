@@ -52,7 +52,9 @@ def make_move(game_id: str, payload: MoveRequest) -> GameStateDTO:
     if not gs:
         raise HTTPException(status_code=404, detail="Game not found.")
     try:
-        new_state = move(gs, payload.index)
+        print(payload)
+        print("hello")
+        new_state = move(gs, payload.index, payload.move)
     except (IndexError, ValueError) as e:
         raise HTTPException(status_code=400, detail=str(e))
     GAMES[game_id].append(new_state)

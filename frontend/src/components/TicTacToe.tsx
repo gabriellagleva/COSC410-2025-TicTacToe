@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { moveContext } from './moveContext';
+import { activeBoardContext } from "./ActiveBoardContext"
 
 type Player = "X" | "O";
 type Cell = Player | null;
@@ -6,7 +8,6 @@ type Cell = Player | null;
 type Props = {
   gameID: number;
   onWin?: (winner: Player | "draw" | null) => void;
-  active: Boolean
 };
 
 // ----- Backend DTOs -----
@@ -26,10 +27,14 @@ const API_BASE =
 
 
 
-export default function TicTacToe({ gameID, onWin, active }: Props) {
+export default function TicTacToe({ gameID, onWin }: Props) {
   const [state, setState] = React.useState<GameStateDTO | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+
+  const { move, setMove } = useContext(moveContext);
+
+  const { activeBoard, setActiveBoard } = useContext(activeBoardContext);
 
   // Create a new game on mount
   React.useEffect(() => {
@@ -69,21 +74,28 @@ export default function TicTacToe({ gameID, onWin, active }: Props) {
     return r.json();
   }
 
-  async function playMove(index: number, move: string): Promise<GameStateDTO> {
+  async function playMove(index: number): Promise<GameStateDTO> {
+
     if (!state) throw new Error("No game");
     const r = await fetch(`${API_BASE}/tictactoe/${state.id}/move`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ index, move }),
+      body: JSON.stringify({ move, index }),
     });
     if (!r.ok) {
       const detail = await r.json().catch(() => ({}));
       throw new Error(detail?.detail ?? `Move failed: ${r.status}`);
     }
+    if (move == "X") {
+      setMove("O")
+    } else {
+      setMove("X")
+    }
+
     return r.json();
   }
 
-  async function handleClick(i: number) {
+  async function handleClick(i: number, gameID: number | "all") {
     if (!state || loading) return;
     // Light client-side guard to avoid noisy 400s:
     if (state.winner || state.is_draw || state.board[i] !== null) return;
@@ -92,6 +104,12 @@ export default function TicTacToe({ gameID, onWin, active }: Props) {
     setError(null);
     try {
       const next = await playMove(i);
+      if (next.winner != "X" && next.winner != "O" && next.is_draw == false) { //checks to make sure the game hasn't ended. Sets active board to all if it has
+        setActiveBoard(i)
+      }
+      else {
+        setActiveBoard("all")
+      }
       setState(next);
     } catch (e: any) {
       setError(e?.message ?? "Move failed");
@@ -147,10 +165,10 @@ export default function TicTacToe({ gameID, onWin, active }: Props) {
         {board.map((c, i) => (
           <button
             key={i}
-            className="aspect-square rounded-2xl border text-3xl font-bold flex items-center justify-center disabled:opacity-50"
-            onClick={() => handleClick(i)}
+            className={"aspect-square rounded-2xl border text-3xl font-bold flex items-center justify-center disabled:opacity-50 "}
+            onClick={() => handleClick(i, gameID)}
             aria-label={`cell-${i}`}
-            disabled={loading || c !== null || state.winner !== null || state.is_draw ||active == false}
+            disabled={loading || c !== null || state.winner !== null || state.is_draw || !(activeBoard == gameID || activeBoard == "all")}  //disables the buttons when the game is loading, a winner has been found, a draw has bappened, or the acitve board is different
           >
             {c}
           </button>
