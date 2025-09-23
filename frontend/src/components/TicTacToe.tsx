@@ -91,18 +91,46 @@ export default function TicTacToe({ gameID, onWin }: Props) {
     return responsepare;
   }
 
-  async function checkValidSpace(spaceID: number) {
-    const r = await fetch(`/${bigBoardID}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
+  async function checkValidSpace(spaceID: number | String) {
+    console.log(`Check if ${spaceID} valid`)
+    if (spaceID == "all") {
+    }
+    else {
+      const r = await fetch(`${API_BASE}/tictactoe/${bigBoardID}`, {
+        method: "GET",
+      });
 
-    if (!r.ok) {
+      if (!r.ok) {
 
-      throw new Error(`HTTP error! status: ${r.status}`);
+        throw new Error(`HTTP error! status: ${r.status}`);
+      }
+
+      let parseresponse = await r.json();
+
+
+      console.log(parseresponse)
+      if (typeof spaceID === "number") {
+        if (parseresponse.board[spaceID] != null) {
+          setActiveBoard("all")
+        }
+      }
+
     }
 
-    console.log(r);
+  }
+
+  async function reportMiniWin(winner: string) {
+    console.log("miniwin reported at ")
+    console.log(gameID)
+    console.log(winner)
+    let move = winner
+    let index = gameID
+    if (!state) throw new Error("No game");
+    const r = await fetch(`${API_BASE}/tictactoe/${bigBoardID}/move`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ move, index }),
+    });
 
   }
 
@@ -129,7 +157,7 @@ export default function TicTacToe({ gameID, onWin }: Props) {
     return r.json();
   }
 
-  async function handleClick(i: number, gameID: number | "all") {
+  async function handleClick(i: number, gameID: number) {
     if (!state || loading) return;
     // Light client-side guard to avoid noisy 400s:
     if (state.winner || state.is_draw || state.board[i] !== null) return;
@@ -143,6 +171,7 @@ export default function TicTacToe({ gameID, onWin }: Props) {
       }
       else {
         setActiveBoard("all")
+        reportMiniWin(move)
       }
       checkValidSpace(i)
       setState(next);
@@ -200,11 +229,11 @@ export default function TicTacToe({ gameID, onWin }: Props) {
         setActiveBoard("all")
       }
       else
-        return (<div className="grid grid-cols-3 gap-2 border-black-99">
+        return (<div className="grid grid-cols-3 gap-2 border">
           {board.map((c, i) => (
             <button
               key={i}
-              className={"aspect-square rounded-2xl border text-3xl font-bold flex items-center justify-center disabled:opacity-10 "}
+              className={"aspect-square rounded-2xl border text-3xl font-bold flex items-center justify-center disabled:opacity-10"}
               onClick={() => handleClick(i, gameID)}
               aria-label={`cell-${i}-${gameID}`}
               disabled={loading || c !== null || state.winner !== null || state.is_draw || !(activeBoard == gameID || activeBoard == "all")}  //disables the buttons when the game is loading, a winner has been found, a draw has bappened, or the acitve board is different
