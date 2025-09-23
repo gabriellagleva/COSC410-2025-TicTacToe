@@ -25,6 +25,8 @@ export const AppProviderActiveBoard = ({ children }: { children: React.ReactNode
   );
 };
 
+
+
 export default function App() {
   const MyContext = createContext('default value');
 
@@ -33,7 +35,7 @@ export default function App() {
       <AppProviderMove>
         <AppProviderActiveBoard>
           <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto p-4 bg-white rounded-lg shadow-lg border border-gray-2004">
-            
+            <TicTacToe gameID={9} />
             <TicTacToe gameID={0} />
             <TicTacToe gameID={1} />
             <TicTacToe gameID={2} />
@@ -43,7 +45,6 @@ export default function App() {
             <TicTacToe gameID={6} />
             <TicTacToe gameID={7} />
             <TicTacToe gameID={8} />
-
           </div>
           <div className="text-center mt-4">
             <button className="rounded-2xl px-4 py-2">
