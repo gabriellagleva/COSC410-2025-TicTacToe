@@ -1,14 +1,15 @@
 import TicTacToe from "@/components/TicTacToe";
-import { createContext } from "react";
-import { useContext } from 'react';
+import { createContext, useState } from "react";
 import { moveContext } from './components/moveContext';
-import { activeBoardContext } from "./components/ActiveBoardContext"
+import { activeBoardContext } from "./components/ActiveBoardContext";
 import { bigBoardContext } from "./components/bigBoardContext";
-import { useState } from 'react';
+import PlayerTurn from "./components/PlayerTurn";
+import { winnerContext } from "./components/winnerContext";
+import WinnerDisplay from "./components/WinnerDisplay"; // 1. Import the new component
 
+// --- Your Provider components ---
 export const AppProviderMove = ({ children }: { children: React.ReactNode }) => {
   const [move, setMove] = useState("X");
-
   return (
     <moveContext.Provider value={{ move, setMove }}>
       {children}
@@ -18,7 +19,6 @@ export const AppProviderMove = ({ children }: { children: React.ReactNode }) => 
 
 export const AppProviderActiveBoard = ({ children }: { children: React.ReactNode }) => {
   const [activeBoard, setActiveBoard] = useState<number | "all">("all");
-
   return (
     <activeBoardContext.Provider value={{ activeBoard, setActiveBoard }}>
       {children}
@@ -28,11 +28,19 @@ export const AppProviderActiveBoard = ({ children }: { children: React.ReactNode
 
 export const AppProviderBigBoard = ({ children }: { children: React.ReactNode }) => {
   const [bigBoardID, setbigBoardID] = useState<string>("placeholder");
-
   return (
     <bigBoardContext.Provider value={{ bigBoardID, setbigBoardID }}>
       {children}
     </bigBoardContext.Provider>
+  );
+};
+
+export const AppProviderWinner = ({ children }: { children: React.ReactNode }) => {
+  const [bigWinner, setBigWinner] = useState<string>("placeholder"); // Initial state
+  return (
+    <winnerContext.Provider value={{ bigWinner, setBigWinner }}>
+      {children}
+    </winnerContext.Provider>
   );
 };
 
@@ -45,26 +53,35 @@ export default function App() {
       <AppProviderMove>
         <AppProviderActiveBoard>
           <AppProviderBigBoard>
-            <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto p-4 bg-white rounded-lg shadow-lg border border-gray-2004">
-              <TicTacToe gameID={9} />
-              <TicTacToe gameID={0} />
-              <TicTacToe gameID={1} />
-              <TicTacToe gameID={2} />
-              <TicTacToe gameID={3} />
-              <TicTacToe gameID={4} />
-              <TicTacToe gameID={5} />
-              <TicTacToe gameID={6} />
-              <TicTacToe gameID={7} />
-              <TicTacToe gameID={8} />
-            </div>
-            <div className="text-center mt-4">
-              <button className="rounded-2xl px-4 py-2">
-                {/* New Game  Ask about new game button */}
-              </button>
-            </div>
+            {/* 2. Wrap everything in the Winner Provider */}
+            <AppProviderWinner>
+              <PlayerTurn />
+              
+              {/* 3. Add the WinnerDisplay component */}
+              <WinnerDisplay />
+
+              <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto p-4 bg-white rounded-lg shadow-lg border border-gray-2004">
+                {/* Your TicTacToe components remain here */}
+                <TicTacToe gameID={9} />
+                <TicTacToe gameID={0} />
+                <TicTacToe gameID={1} />
+                <TicTacToe gameID={2} />
+                <TicTacToe gameID={3} />
+                <TicTacToe gameID={4} />
+                <TicTacToe gameID={5} />
+                <TicTacToe gameID={6} />
+                <TicTacToe gameID={7} />
+                <TicTacToe gameID={8} />
+              </div>
+              <div className="text-center mt-4">
+                <button className="rounded-2xl px-4 py-2">
+                  {/* New Game Ask about new game button */}
+                </button>
+              </div>
+            </AppProviderWinner>
           </AppProviderBigBoard>
         </AppProviderActiveBoard>
       </AppProviderMove>
-    </div >
+    </div>
   );
 }
