@@ -21,7 +21,7 @@ def test_cannot_play_occupied_cell():
     gs = new_game()
     gs = move(gs, 0, "X")
     with pytest.raises(ValueError):
-        move(gs, 0)
+        move(gs, 0, "X")
 
 def test_winning_rows_cols_diagonals():
     # Row win
@@ -59,11 +59,12 @@ def test_draw_condition():
     # sequence crafted to avoid earlier wins
     seq = [0,1,2,5,3,6,4,8,7]
     for i in seq:
+        move = "placeholder"
         if i%2 == 1:
             move = "X"
         else:
             move="O"
-        gs = move(gs, i,move)
+        gs = move(gs, i, move)
     assert gs.is_draw is True
     assert gs.winner is None
 
@@ -82,4 +83,4 @@ def test_game_over_disallows_moves():
     gs = move(gs, 4, "O") # O
     gs = move(gs, 2, "X") # X wins
     with pytest.raises(ValueError):
-        move(gs, 8)
+        move(gs, 8 , "X")
