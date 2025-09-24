@@ -26,19 +26,19 @@ def test_make_move_and_win_flow():
     gid = r.json()["id"]
 
     # X at 0
-    r = client.post(f"/tictactoe/{gid}/move", json={"index": 0})
+    r = client.post(f"/tictactoe/{gid}/move", json={"index": 0, "move" :"X"})
     assert r.status_code == 200
     # O at 3
-    r = client.post(f"/tictactoe/{gid}/move", json={"index": 3})
+    r = client.post(f"/tictactoe/{gid}/move", json={"index": 3, "move" :"O"})
     assert r.status_code == 200
     # X at 1
-    r = client.post(f"/tictactoe/{gid}/move", json={"index": 1})
+    r = client.post(f"/tictactoe/{gid}/move", json={"index": 1, "move" :"X"})
     assert r.status_code == 200
     # O at 4
-    r = client.post(f"/tictactoe/{gid}/move", json={"index": 4})
+    r = client.post(f"/tictactoe/{gid}/move", json={"index": 4, "move" :"O"})
     assert r.status_code == 200
     # X at 2 -> win
-    r = client.post(f"/tictactoe/{gid}/move", json={"index": 2})
+    r = client.post(f"/tictactoe/{gid}/move", json={"index": 2, "move" :"X"})
     assert r.status_code == 200
     data = r.json()
     assert data["winner"] == "X"
@@ -48,12 +48,12 @@ def test_bad_requests():
     r = client.post("/tictactoe/new", json={})
     gid = r.json()["id"]
 
-    r = client.post(f"/tictactoe/{gid}/move", json={"index": 99})
+    r = client.post(f"/tictactoe/{gid}/move", json={"index": 99, "move" :"X"})
     assert r.status_code == 400
     assert "Index must be in range" in r.json()["detail"]
 
     # occupy 0 then try again
-    client.post(f"/tictactoe/{gid}/move", json={"index": 0})
-    r = client.post(f"/tictactoe/{gid}/move", json={"index": 0})
+    client.post(f"/tictactoe/{gid}/move", json={"index": 0, "move" :"X"})
+    r = client.post(f"/tictactoe/{gid}/move", json={"index": 0, "move" :"X"})
     assert r.status_code == 400
     assert "Cell already occupied" in r.json()["detail"]
